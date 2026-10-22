@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>
 
-const StatisticLine = (props) => {
+const StatisticLine = ({ text, value }) => {
   return (
     <tr>
-      <td>{props.text}</td>
-      <td>{props.value}{props.text === 'positive' ? ' %' : ''}</td>
+      <td>{text}</td>
+      <td>{value}{text === 'positive' ? ' %' : ''}</td>
     </tr>
   )
 }
