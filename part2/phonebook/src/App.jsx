@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Notification from './components/Notification'
 import personService from './services/persons'
 
 const Filter = ({ search, onSearchChange }) => (
@@ -41,6 +42,8 @@ const App = () => {
   const [search, setSearch] = useState('')
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [notificationType, setNotificationType] = useState('success')
 
   useEffect(() => {
     personService
@@ -74,10 +77,23 @@ const App = () => {
         .update(existingPerson.id, updatedPerson)
         .then(returnedPerson => {
           setPersons(persons.map(person => person.id === existingPerson.id ? returnedPerson : person))
+          setNotificationType('success')
+          setNotification(`Updated ${returnedPerson.name}`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 5000)
+          setNewName('')
+          setNewNumber('')
+          setSearch('')
         })
-      setNewName('')
-      setNewNumber('')
-      setSearch('')
+        .catch(() => {
+          setNotificationType('error')
+          setNotification(`Information of ${existingPerson.name} has already been removed from server`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 5000)
+          setPersons(persons.filter(entry => entry.id !== existingPerson.id))
+        })
       return
     }
     const newPerson = { name: newName, number: newNumber }
@@ -85,6 +101,11 @@ const App = () => {
       .create(newPerson)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setNotificationType('success')
+        setNotification(`Added ${newPerson.name}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
         setNewName('')
         setNewNumber('')
         setSearch('')
@@ -105,6 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} type={notificationType} />
       <Filter search={search} onSearchChange={handleSearchChange} />
       <h3>Add a new</h3>
       <PersonForm 
